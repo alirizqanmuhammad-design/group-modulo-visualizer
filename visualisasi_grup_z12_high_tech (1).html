@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group Modulo Visualizer - High-Tech Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: #030712;
+            color: #f3f4f6;
+            overflow-x: hidden;
+        }
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+        /* Neon Glow Effects */
+        .glow-cyan {
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.4), inset 0 0 15px rgba(6, 182, 212, 0.2);
+        }
+        .glow-purple {
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.4), inset 0 0 15px rgba(168, 85, 247, 0.2);
+        }
+        .text-glow-cyan {
+            text-shadow: 0 0 8px rgba(6, 182, 212, 0.8);
+        }
+        .text-glow-purple {
+            text-shadow: 0 0 8px rgba(168, 85, 247, 0.8);
+        }
+        /* Glassmorphism */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(56, 189, 248, 0.15);
+        }
+        .glass-panel:hover {
+            border-color: rgba(56, 189, 248, 0.3);
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090d16;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #06b6d4;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-purple-950/20 to-black">
+
+    <!-- Top Header -->
+    <header class="border-b border-cyan-900/40 glass-panel sticky top-0 z-50 px-4 py-3">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div id="moduloLogo" class="w-12 h-10 px-2 rounded-lg bg-gradient-to-tr from-cyan-500 to-purple-600 flex items-center justify-center font-orbitron font-black text-lg text-black shadow-lg shadow-cyan-500/30">
+                    Z₁₂
+                </div>
+                <div>
+                    <h1 class="font-orbitron text-xl font-extrabold tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-purple-300 to-pink-500 text-glow-cyan">
+                        GROUP MODULO
+                    </h1>
+                    <p id="groupDescription" class="text-xs text-slate-400">Grup Aditif Integers Modulo 12 : (ℤ₁₂, +₁₂)</p>
+                </div>
+            </div>
+
+            <!-- Modulo Selector Filter & Specs -->
+            <div class="flex flex-wrap items-center gap-3">
+                <div class="flex items-center gap-2 bg-slate-950/80 px-3 py-1.5 rounded-xl border border-cyan-500/30">
+                    <label for="moduloSelect" class="text-xs font-orbitron font-semibold text-cyan-400">PILIH MODULO (n):</label>
+                    <select id="moduloSelect" onchange="changeModulo(parseInt(this.value))" class="bg-slate-900 text-cyan-300 font-orbitron font-bold text-sm px-2 py-1 rounded border border-cyan-500/50 focus:outline-none focus:border-cyan-300">
+                        <!-- Populated by JS for Modulo 2 to 100 -->
+                    </select>
+                </div>
+
+                <!-- Quick Specs Badges -->
+                <div class="flex flex-wrap items-center gap-2 text-xs font-orbitron">
+                    <span id="badgeOrder" class="px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span> Orde |G| = 12
+                    </span>
+                    <span class="px-3 py-1 rounded-full bg-purple-950/80 border border-purple-500/40 text-purple-300">
+                        Grup Abel & Siklik
+                    </span>
+                    <span id="badgeGenerators" class="px-3 py-1 rounded-full bg-pink-950/80 border border-pink-500/40 text-pink-300 max-w-md truncate">
+                        Generator: 1, 5, 7, 11
+                    </span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 my-2">
+
+        <!-- LEFT COLUMN: Circle Visualizer & Element Inspector (5 cols) -->
+        <section class="lg:col-span-5 flex flex-col gap-6">
+            
+            <!-- Cyclic Orbital Sphere Visualizer -->
+            <div class="glass-panel rounded-2xl p-5 relative overflow-hidden flex flex-col items-center">
+                <div class="w-full flex justify-between items-center mb-2">
+                    <h2 class="font-orbitron font-bold text-lg text-cyan-300 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        VISUALISASI ORBIT 3D SPERIS
+                    </h2>
+                    <div class="flex items-center gap-2">
+                        <span id="clockTitle" class="text-xs font-mono text-slate-400">Modulo 12 Sphere</span>
+                        <!-- Fullscreen Toggle Button -->
+                        <button onclick="openFullscreenModal()" title="Layar Penuh" class="p-1.5 rounded-lg bg-cyan-950/80 border border-cyan-500/50 text-cyan-300 hover:bg-cyan-500/30 hover:text-white transition font-orbitron font-bold text-xs flex items-center gap-1 shadow-[0_0_10px_rgba(6,182,212,0.3)]">
+                            ⛶ <span class="hidden sm:inline">FULLSCREEN</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Canvas Component with Interactive Controls Hints -->
+                <div class="relative w-full aspect-square max-w-[340px] flex items-center justify-center my-1 cursor-grab active:cursor-grabbing group" id="canvasContainer">
+                    <canvas id="clockCanvas" width="340" height="340" class="w-full h-full drop-shadow-[0_0_25px_rgba(6,182,212,0.3)]"></canvas>
+                    
+                    <!-- Zoom Overlay Controls on Canvas -->
+                    <div class="absolute top-2 right-2 flex flex-col gap-1 z-10">
+                        <button onclick="adjustZoom(0.15)" title="Zoom In" class="w-8 h-8 rounded-lg bg-slate-950/80 border border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/30 flex items-center justify-center font-bold text-base shadow">
+                            +
+                        </button>
+                        <button onclick="adjustZoom(-0.15)" title="Zoom Out" class="w-8 h-8 rounded-lg bg-slate-950/80 border border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/30 flex items-center justify-center font-bold text-base shadow">
+                            -
+                        </button>
+                        <button onclick="resetZoom()" title="Reset Zoom" class="w-8 h-8 rounded-lg bg-slate-950/80 border border-purple-500/40 text-purple-300 hover:bg-purple-500/30 flex items-center justify-center font-bold text-xs shadow">
+                            🎯
+                        </button>
+                    </div>
+
+                    <div class="absolute bottom-2 right-2 bg-slate-950/80 border border-slate-800 px-2 py-1 rounded text-[10px] font-mono text-slate-400 pointer-events-none opacity-70 group-hover:opacity-100 transition">
+                        🖱️ Drag untuk Putar • Scroll Zoom
+                    </div>
+                </div>
+
+                <!-- Viewport Control Toggles -->
+                <div class="w-full flex items-center justify-between gap-2 mb-2 text-xs font-mono">
+                    <button id="toggleAutoRotate" onclick="toggleAutoRotation()" class="px-2.5 py-1 rounded-lg bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/20 transition flex items-center gap-1">
+                        <span id="rotateIcon" class="inline-block animate-spin">🔄</span> <span id="rotateBtnText">Rotasi Otomatis</span>
+                    </button>
+                    <button onclick="resetCamera3D()" class="px-2.5 py-1 rounded-lg bg-purple-950/80 border border-purple-500/40 text-purple-300 hover:bg-purple-500/20 transition">
+                        🎯 Reset Sudut
+                    </button>
+                </div>
+
+                <!-- Sequence Path Indicator -->
+                <div class="w-full px-2 py-1.5 rounded-lg bg-slate-950/80 border border-slate-800 my-1 text-center font-mono text-xs overflow-x-auto whitespace-nowrap">
+                    <span class="text-slate-400">Lintasan Urutan ⟨a⟩: </span>
+                    <span id="pathSequence" class="text-cyan-300 font-bold">0 → 1 → ...</span>
+                </div>
+
+                <!-- Generator Selector Buttons -->
+                <div class="w-full mt-2">
+                    <label class="text-xs text-slate-400 font-mono mb-1 block">SIMULASI GENERATOR LINTASAN (<span id="genLabel" class="text-cyan-400">1</span>):</label>
+                    <div id="generatorButtonsContainer" class="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-1">
+                        <!-- Generated Dynamically by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Element Inspector Panel -->
+            <div class="glass-panel rounded-2xl p-5 border-l-4 border-l-purple-500">
+                <h2 class="font-orbitron font-bold text-lg text-purple-300 mb-3 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                    INSPEKTOR ELEMEN & SIFAT
+                </h2>
+
+                <div class="flex items-center gap-4 mb-4">
+                    <label id="elemSelectLabel" class="text-xs text-slate-400 font-mono">PILIH ELEMEN (a ∈ ℤ₁₂):</label>
+                    <select id="elementSelect" onchange="inspectElement(parseInt(this.value))" class="bg-slate-900 border border-purple-500/50 rounded-lg px-3 py-1.5 text-purple-300 font-orbitron font-bold text-base focus:outline-none focus:border-purple-400">
+                        <!-- Options generated by JS -->
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 text-sm">
+                    <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
+                        <span class="text-xs text-slate-400 block font-mono">Orde Elemen |a|:</span>
+                        <span id="elemOrder" class="font-orbitron text-xl text-cyan-400 font-bold">1</span>
+                    </div>
+                    <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
+                        <span id="elemInverseLabel" class="text-xs text-slate-400 block font-mono">Invers Aditif (-a mod 12):</span>
+                        <span id="elemInverse" class="font-orbitron text-xl text-pink-400 font-bold">0</span>
+                    </div>
+                    <div class="col-span-2 p-3 rounded-xl bg-slate-900/80 border border-slate-800">
+                        <span class="text-xs text-slate-400 block font-mono">Subgrup yang Dihasilkan ⟨a⟩:</span>
+                        <span id="elemSubgroup" class="font-orbitron text-lg text-emerald-400 font-semibold">{0}</span>
+                    </div>
+                    <div class="col-span-2 p-3 rounded-xl bg-slate-900/80 border border-slate-800">
+                        <span class="text-xs text-slate-400 block font-mono">Apakah Generator?</span>
+                        <span id="elemIsGen" class="font-orbitron text-sm text-yellow-400 font-bold">Tidak</span>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- RIGHT COLUMN: Cayley Table & Subgroup Lattice (7 cols) -->
+        <section class="lg:col-span-7 flex flex-col gap-6">
+
+            <!-- Cayley Table Panel -->
+            <div class="glass-panel rounded-2xl p-5 overflow-hidden">
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 mb-4">
+                    <div>
+                        <h2 class="font-orbitron font-bold text-lg text-cyan-300 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+                            TABEL CAYLEY
+                        </h2>
+                        <p id="tableHoverHelp" class="text-xs text-slate-400">Arahkan kursor ke sel untuk melihat persamaan $(a + b) \pmod{12}$</p>
+                    </div>
+                    <div id="equationDisplay" class="px-3 py-1.5 rounded-lg bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 font-mono text-sm font-bold shadow-inner text-center">
+                        a + b ≡ c (mod n)
+                    </div>
+                </div>
+
+                <!-- Table Container with custom scroll -->
+                <div class="overflow-x-auto max-h-[420px]">
+                    <table id="cayleyTable" class="w-full text-center font-orbitron text-xs border-collapse">
+                        <!-- Rendered by JavaScript -->
+                    </table>
+                </div>
+            </div>
+
+            <!-- Subgroup Lattice Section -->
+            <div class="glass-panel rounded-2xl p-5">
+                <div class="flex justify-between items-center mb-3">
+                    <h2 id="subgroupLatticeTitle" class="font-orbitron font-bold text-lg text-pink-400 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                        DIAGRAM LATTICE SUBGRUP ℤ₁₂
+                    </h2>
+                    <span id="lagrangeText" class="text-xs font-mono text-slate-400">Teorema Lagrange (|H| membagi 12)</span>
+                </div>
+
+                <p id="divisorsInfo" class="text-xs text-slate-400 mb-4">
+                    Menurut Teorema Pembagi Positif...
+                </p>
+
+                <!-- Interactive Subgroup Tree Cards Container -->
+                <div id="subgroupsContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-72 overflow-y-auto p-1">
+                    <!-- Dynamic Subgroup Cards Rendered JS -->
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- FULLSCREEN MODAL FOR 3D SPHERICAL ORBIT VISUALIZER -->
+    <div id="fullscreenModal" class="fixed inset-0 bg-black/95 backdrop-blur-2xl z-[100] hidden flex-col justify-between p-4 md:p-6 overflow-hidden">
+        
+        <!-- Modal Top Header Bar -->
+        <div class="flex justify-between items-center bg-slate-950/80 border border-cyan-500/30 p-3 rounded-2xl glass-panel">
+            <div class="flex items-center gap-3">
+                <div id="modalLogo" class="w-10 h-10 rounded-lg bg-gradient-to-tr from-cyan-500 to-purple-600 flex items-center justify-center font-orbitron font-black text-base text-black shadow-lg shadow-cyan-500/30">
+                    Z₁₂
+                </div>
+                <div>
+                    <h2 class="font-orbitron font-extrabold text-base md:text-lg text-cyan-300 text-glow-cyan">
+                        VISUALISASI ORBIT 3D SPERIS (FULLSCREEN)
+                    </h2>
+                    <p id="modalPathSeq" class="text-xs font-mono text-slate-400 truncate max-w-xl">
+                        Lintasan ⟨a⟩: 0 → 1 → ...
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button onclick="toggleAutoRotation()" class="px-3 py-1.5 rounded-xl bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/30 font-mono text-xs transition hidden sm:flex items-center gap-1">
+                    🔄 Rotasi
+                </button>
+                <button onclick="resetCamera3D()" class="px-3 py-1.5 rounded-xl bg-purple-950/80 border border-purple-500/40 text-purple-300 hover:bg-purple-500/30 font-mono text-xs transition hidden sm:block">
+                    🎯 Reset Kamera
+                </button>
+                <button onclick="closeFullscreenModal()" class="px-4 py-1.5 rounded-xl bg-pink-600 hover:bg-pink-500 text-white font-orbitron font-bold text-xs transition shadow-lg shadow-pink-600/30">
+                    ✕ TUTUP [ESC]
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Modal Canvas Area with Floating Zoom Controls -->
+        <div class="relative flex-1 w-full flex items-center justify-center my-2 cursor-grab active:cursor-grabbing group overflow-hidden" id="modalCanvasContainer">
+            <canvas id="modalClockCanvas" class="w-full h-full object-contain drop-shadow-[0_0_35px_rgba(6,182,212,0.4)]"></canvas>
+
+            <!-- Floating Overlay Control Panel (Zoom & Controls) -->
+            <div class="absolute top-4 right-4 flex flex-col gap-2 z-10">
+                <button onclick="adjustZoom(0.2)" title="Zoom In (+)" class="w-10 h-10 rounded-xl bg-slate-950/90 border border-cyan-500/50 text-cyan-300 hover:bg-cyan-500/30 font-black text-xl flex items-center justify-center shadow-lg backdrop-blur">
+                    +
+                </button>
+                <button onclick="adjustZoom(-0.2)" title="Zoom Out (-)" class="w-10 h-10 rounded-xl bg-slate-950/90 border border-cyan-500/50 text-cyan-300 hover:bg-cyan-500/30 font-black text-xl flex items-center justify-center shadow-lg backdrop-blur">
+                    -
+                </button>
+                <button onclick="resetZoom()" title="Reset Zoom" class="w-10 h-10 rounded-xl bg-slate-950/90 border border-purple-500/50 text-purple-300 hover:bg-purple-500/30 font-bold text-sm flex items-center justify-center shadow-lg backdrop-blur">
+                    🎯
+                </button>
+            </div>
+
+            <!-- Drag & Zoom Hint -->
+            <div class="absolute bottom-4 left-4 bg-slate-950/90 border border-slate-800 px-3 py-1.5 rounded-xl text-xs font-mono text-slate-300 backdrop-blur pointer-events-none opacity-80">
+                🖱️ Drag/Sentuh untuk Rotasi • Scroll Wheel untuk Zoom In/Out
+            </div>
+        </div>
+
+        <!-- Modal Bottom Element & Generator Selector Bar -->
+        <div class="bg-slate-950/80 border border-cyan-500/30 p-3 rounded-2xl glass-panel flex flex-col md:flex-row items-center justify-between gap-3">
+            <div class="text-xs font-orbitron font-semibold text-cyan-400 whitespace-nowrap">
+                PILIH ELEMEN GENERATOR (a ∈ ℤ<span id="modalSubscript">₁₂</span>):
+            </div>
+            
+            <div id="modalGeneratorButtonsContainer" class="flex flex-wrap items-center justify-center gap-1.5 max-h-24 overflow-y-auto w-full p-1">
+                <!-- Populated dynamically by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800/80 glass-panel py-3 px-4 text-center text-xs text-slate-500 font-mono">
+        <p>created by muhammad ali rizqan</p>
+    </footer>
+
+    <script>
+        // --- State Management Variables ---
+        let moduloN = 12;
+        let elements = [];
+        let activeGenerator = 1;
+        let highlightedSubgroupElems = [];
+        let canvas, ctx;
+        let modalCanvas, modalCtx;
+        let isFullscreen = false;
+        let animationAngle = 0;
+
+        // 3D Orbital Projection Parameters
+        let rotX = 0.35;
+        let rotY = 0.45;
+        let zoomScale = 1.0; // Dynamic Zoom Factor
+        let isDragging = false;
+        let previousMouseX = 0;
+        let previousMouseY = 0;
+        let isAutoRotating = true;
+
+        // GCD Utility Function
+        function gcd(a, b) {
+            return b === 0 ? a : gcd(b, a % b);
+        }
+
+        // Get Unicode Subscript for Modulo Badge
+        function getSubscript(n) {
+            const digits = n.toString().split('');
+            const subscripts = {'0':'₀','1':'₁','2':'₂','3':'₃','4':'₄','5':'₅','6':'₆','7':'₇','8':'₈','9':'₉'};
+            return digits.map(d => subscripts[d] || d).join('');
+        }
+
+        // --- Initialization ---
+        window.onload = function() {
+            populateModuloSelect();
+            canvas = document.getElementById('clockCanvas');
+            ctx = canvas.getContext('2d');
+            
+            modalCanvas = document.getElementById('modalClockCanvas');
+            modalCtx = modalCanvas.getContext('2d');
+
+            // Mouse / Touch / Scroll Controls for 3D Drag Rotation & Zooming
+            setup3DInteractions();
+
+            // Set default modulo 12
+            changeModulo(12);
+
+            // Escape key listener for fullscreen modal
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && isFullscreen) {
+                    closeFullscreenModal();
+                }
+            });
+
+            // Resize listener for full screen canvas resolution scaling
+            window.addEventListener('resize', () => {
+                if (isFullscreen && modalCanvas) {
+                    resizeModalCanvas();
+                }
+            });
+
+            // Start Canvas Animation Loop
+            requestAnimationFrame(renderClock);
+        };
+
+        function setup3DInteractions() {
+            const containers = [
+                document.getElementById('canvasContainer'),
+                document.getElementById('modalCanvasContainer')
+            ];
+
+            containers.forEach(container => {
+                if (!container) return;
+
+                container.addEventListener('mousedown', (e) => {
+                    isDragging = true;
+                    previousMouseX = e.clientX;
+                    previousMouseY = e.clientY;
+                });
+
+                // Wheel Event for Zoom In / Zoom Out
+                container.addEventListener('wheel', (e) => {
+                    e.preventDefault();
+                    if (e.deltaY < 0) {
+                        adjustZoom(0.1);
+                    } else {
+                        adjustZoom(-0.1);
+                    }
+                }, { passive: false });
+
+                // Touch support for mobile devices
+                container.addEventListener('touchstart', (e) => {
+                    if (e.touches.length === 1) {
+                        isDragging = true;
+                        previousMouseX = e.touches[0].clientX;
+                        previousMouseY = e.touches[0].clientY;
+                    }
+                }, { passive: true });
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                const deltaX = e.clientX - previousMouseX;
+                const deltaY = e.clientY - previousMouseY;
+
+                rotY += deltaX * 0.008;
+                rotX += deltaY * 0.008;
+
+                previousMouseX = e.clientX;
+                previousMouseY = e.clientY;
+            });
+
+            window.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+
+            window.addEventListener('touchmove', (e) => {
+                if (!isDragging || e.touches.length !== 1) return;
+                const deltaX = e.touches[0].clientX - previousMouseX;
+                const deltaY = e.touches[0].clientY - previousMouseY;
+
+                rotY += deltaX * 0.008;
+                rotX += deltaY * 0.008;
+
+                previousMouseX = e.touches[0].clientX;
+                previousMouseY = e.touches[0].clientY;
+            }, { passive: true });
+
+            window.addEventListener('touchend', () => {
+                isDragging = false;
+            });
+        }
+
+        function adjustZoom(delta) {
+            zoomScale = Math.max(0.4, Math.min(3.5, zoomScale + delta));
+        }
+
+        function resetZoom() {
+            zoomScale = 1.0;
+        }
+
+        function toggleAutoRotation() {
+            isAutoRotating = !isAutoRotating;
+            const btnText = document.getElementById('rotateBtnText');
+            const icon = document.getElementById('rotateIcon');
+            if (isAutoRotating) {
+                if (btnText) btnText.innerText = "Rotasi Otomatis";
+                if (icon) icon.className = "inline-block animate-spin";
+            } else {
+                if (btnText) btnText.innerText = "Rotasi Paused";
+                if (icon) icon.className = "inline-block";
+            }
+        }
+
+        function resetCamera3D() {
+            rotX = 0.35;
+            rotY = 0.45;
+            zoomScale = 1.0;
+        }
+
+        // Fullscreen Modal Open/Close Controls
+        function openFullscreenModal() {
+            isFullscreen = true;
+            const modal = document.getElementById('fullscreenModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+
+            resizeModalCanvas();
+            updateModalUI();
+        }
+
+        function closeFullscreenModal() {
+            isFullscreen = false;
+            const modal = document.getElementById('fullscreenModal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function resizeModalCanvas() {
+            const container = document.getElementById('modalCanvasContainer');
+            if (container && modalCanvas) {
+                modalCanvas.width = container.clientWidth;
+                modalCanvas.height = container.clientHeight;
+            }
+        }
+
+        function updateModalUI() {
+            document.getElementById('modalLogo').innerText = `ℤ${getSubscript(moduloN)}`;
+            document.getElementById('modalSubscript').innerText = getSubscript(moduloN);
+            
+            const seqText = document.getElementById('pathSequence').innerText;
+            document.getElementById('modalPathSeq').innerText = `Lintasan ⟨${activeGenerator}⟩: ${seqText}`;
+
+            // Sync modal buttons
+            const modalContainer = document.getElementById('modalGeneratorButtonsContainer');
+            if (modalContainer) {
+                modalContainer.innerHTML = '';
+                elements.forEach(a => {
+                    const isGen = gcd(a, moduloN) === 1;
+                    const btn = document.createElement('button');
+                    btn.onclick = () => {
+                        inspectElement(a);
+                        updateModalUI();
+                    };
+                    btn.className = `px-2.5 py-1 min-w-[36px] rounded-lg text-xs font-orbitron font-bold transition flex items-center justify-center border ${
+                        a === activeGenerator 
+                            ? 'bg-cyan-500 text-black border-cyan-300 shadow-[0_0_12px_rgba(6,182,212,0.9)] scale-105' 
+                            : (isGen 
+                                ? 'bg-cyan-950/80 text-cyan-300 border-cyan-500/50 hover:bg-cyan-500/30' 
+                                : 'bg-slate-900/80 text-slate-400 border-slate-800 hover:bg-slate-800')
+                    }`;
+                    btn.innerText = a;
+                    modalContainer.appendChild(btn);
+                });
+            }
+        }
+
+        // Populate Modulo Select Dropdown (2 to 100)
+        function populateModuloSelect() {
+            const select = document.getElementById('moduloSelect');
+            select.innerHTML = '';
+            for (let i = 2; i <= 100; i++) {
+                const opt = document.createElement('option');
+                opt.value = i;
+                opt.innerText = `ℤ${getSubscript(i)} (Modulo ${i})`;
+                if (i === 12) opt.selected = true;
+                select.appendChild(opt);
+            }
+        }
+
+        // Core Modulo Change Switcher
+        function changeModulo(n) {
+            moduloN = n;
+            elements = Array.from({length: moduloN}, (_, i) => i);
+            activeGenerator = 1;
+            highlightedSubgroupElems = [];
+
+            // Update Header & Badge UI
+            document.getElementById('moduloLogo').innerText = `ℤ${getSubscript(moduloN)}`;
+            document.getElementById('groupDescription').innerText = `Grup Aditif Integers Modulo ${moduloN} : (ℤ${getSubscript(moduloN)}, +${getSubscript(moduloN)})`;
+            document.getElementById('badgeOrder').innerHTML = `<span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span> Orde |G| = ${moduloN}`;
+
+            // Find all generators for Z_n (gcd(a, n) === 1)
+            const generators = elements.filter(a => gcd(a, moduloN) === 1);
+            document.getElementById('badgeGenerators').innerText = `Generator (${generators.length}): ${generators.join(', ')}`;
+
+            // Update Labels
+            document.getElementById('clockTitle').innerText = `Modulo ${moduloN} Sphere`;
+            document.getElementById('elemSelectLabel').innerText = `PILIH ELEMEN (a ∈ ℤ${getSubscript(moduloN)}):`;
+            document.getElementById('elemInverseLabel').innerText = `Invers Aditif (-a mod ${moduloN}):`;
+            document.getElementById('tableHoverHelp').innerText = `Arahkan kursor ke sel untuk melihat persamaan (a + b) (mod ${moduloN})`;
+            document.getElementById('subgroupLatticeTitle').innerHTML = `<svg class="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg> DIAGRAM LATTICE SUBGRUP ℤ${getSubscript(moduloN)}`;
+            document.getElementById('lagrangeText').innerText = `Teorema Lagrange (|H| membagi ${moduloN})`;
+
+            // Rebuild UI Components
+            buildGeneratorButtons();
+            populateElementSelect();
+            buildCayleyTable();
+            buildSubgroupCards();
+            inspectElement(1);
+
+            if (isFullscreen) updateModalUI();
+        }
+
+        function setGenerator(a) {
+            inspectElement(a);
+        }
+
+        function buildGeneratorButtons() {
+            const container = document.getElementById('generatorButtonsContainer');
+            container.innerHTML = '';
+
+            elements.forEach(a => {
+                const isGen = gcd(a, moduloN) === 1;
+                const btn = document.createElement('button');
+                btn.id = `gen-btn-${a}`;
+                btn.onclick = () => setGenerator(a);
+                btn.className = `px-2 py-1 min-w-[32px] rounded text-xs font-orbitron font-bold transition flex items-center justify-center border ${
+                    a === activeGenerator 
+                        ? 'bg-cyan-500 text-black border-cyan-300 shadow-[0_0_10px_rgba(6,182,212,0.8)]' 
+                        : (isGen 
+                            ? 'bg-cyan-950/60 text-cyan-300 border-cyan-500/50 hover:bg-cyan-500/30' 
+                            : 'bg-slate-900/60 text-slate-400 border-slate-800 hover:bg-slate-800')
+                }`;
+                btn.innerText = a;
+                container.appendChild(btn);
+            });
+        }
+
+        function populateElementSelect() {
+            const select = document.getElementById('elementSelect');
+            select.innerHTML = '';
+            elements.forEach(a => {
+                const opt = document.createElement('option');
+                opt.value = a;
+                opt.innerText = `Elemen ${a}`;
+                select.appendChild(opt);
+            });
+        }
+
+        function inspectElement(a) {
+            activeGenerator = a;
+
+            // Sync select UI
+            const select = document.getElementById('elementSelect');
+            if (select) select.value = a;
+
+            // Compute Generated Subgroup <a proposed>
+            const subgroup = [];
+            let curr = 0;
+            do {
+                subgroup.push(curr);
+                curr = (curr + a) % moduloN;
+            } while (curr !== 0 && !subgroup.includes(curr));
+
+            // Element Order
+            const order = subgroup.length;
+
+            // Additive Inverse (-a mod n)
+            const inverse = (moduloN - a) % moduloN;
+
+            // Is Generator?
+            const isGen = gcd(a, moduloN) === 1;
+
+            // Update Inspector UI
+            document.getElementById('elemOrder').innerText = order;
+            document.getElementById('elemInverse').innerText = inverse;
+            
+            const sortedSubgroup = subgroup.sort((x,y)=>x-y);
+            const subgroupStr = sortedSubgroup.length > 20 
+                ? `{${sortedSubgroup.slice(0, 15).join(', ')}, ... (${sortedSubgroup.length} elemen)}`
+                : `{${sortedSubgroup.join(', ')}}`;
+
+            document.getElementById('elemSubgroup').innerText = subgroupStr;
+            document.getElementById('elemIsGen').innerText = isGen ? 'Ya (Generator Utama)' : 'Bukan Generator Utama';
+            document.getElementById('elemIsGen').className = `font-orbitron text-sm font-bold ${isGen ? 'text-yellow-400' : 'text-slate-400'}`;
+
+            document.getElementById('genLabel').innerText = a;
+
+            // Update Trajectory Path UI
+            const pathArr = subgroup.length > 20 
+                ? [...subgroup.slice(0, 10), '...', subgroup[subgroup.length - 1], 0]
+                : [...subgroup, 0];
+            document.getElementById('pathSequence').innerText = pathArr.join(' → ');
+
+            // Highlight buttons
+            elements.forEach(e => {
+                const b = document.getElementById(`gen-btn-${e}`);
+                if (b) {
+                    const isEGen = gcd(e, moduloN) === 1;
+                    if (e === a) {
+                        b.className = 'px-2 py-1 min-w-[32px] rounded text-xs font-orbitron font-bold transition flex items-center justify-center border bg-cyan-500 text-black border-cyan-300 shadow-[0_0_10px_rgba(6,182,212,0.8)]';
+                    } else if (isEGen) {
+                        b.className = 'px-2 py-1 min-w-[32px] rounded text-xs font-orbitron font-bold transition flex items-center justify-center border bg-cyan-950/60 text-cyan-300 border-cyan-500/50 hover:bg-cyan-500/30';
+                    } else {
+                        b.className = 'px-2 py-1 min-w-[32px] rounded text-xs font-orbitron font-bold transition flex items-center justify-center border bg-slate-900/60 text-slate-400 border-slate-800 hover:bg-slate-800';
+                    }
+                }
+            });
+
+            if (isFullscreen) updateModalUI();
+        }
+
+        function buildCayleyTable() {
+            const table = document.getElementById('cayleyTable');
+            table.innerHTML = '';
+
+            // Header Row
+            const thead = document.createElement('thead');
+            const headerRow = document.createElement('tr');
+            
+            // Top-left + cell
+            const thPlus = document.createElement('th');
+            thPlus.className = 'p-1.5 bg-slate-950 text-cyan-400 border border-slate-800 font-black text-xs sticky top-0 left-0 z-20';
+            thPlus.innerText = `+${getSubscript(moduloN)}`;
+            headerRow.appendChild(thPlus);
+
+            elements.forEach(b => {
+                const th = document.createElement('th');
+                th.className = 'p-1.5 bg-slate-900/90 text-cyan-300 border border-slate-800 hover:bg-cyan-950/50 transition cursor-pointer sticky top-0 z-10 font-bold min-w-[28px]';
+                th.innerText = b;
+                headerRow.appendChild(th);
+            });
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+
+            // Table Body
+            const tbody = document.createElement('tbody');
+            elements.forEach(a => {
+                const tr = document.createElement('tr');
+
+                // Row Header
+                const tdHead = document.createElement('td');
+                tdHead.className = 'p-1.5 bg-slate-900/90 text-cyan-300 border border-slate-800 font-bold sticky left-0 z-10 min-w-[28px]';
+                tdHead.innerText = a;
+                tr.appendChild(tdHead);
+
+                elements.forEach(b => {
+                    const result = (a + b) % moduloN;
+                    const td = document.createElement('td');
+                    td.className = 'p-1.5 border border-slate-800/80 hover:bg-cyan-500/20 hover:text-cyan-200 transition cursor-default text-slate-300 min-w-[28px]';
+                    td.innerText = result;
+
+                    // Hover equation tooltip display
+                    td.onmouseenter = () => {
+                        document.getElementById('equationDisplay').innerText = `(${a} + ${b}) mod ${moduloN} = ${result}`;
+                    };
+                    td.onmouseleave = () => {
+                        document.getElementById('equationDisplay').innerText = `a + b ≡ c (mod ${moduloN})`;
+                    };
+
+                    tr.appendChild(td);
+                });
+
+                tbody.appendChild(tr);
+            });
+            table.appendChild(tbody);
+        }
+
+        function buildSubgroupCards() {
+            const container = document.getElementById('subgroupsContainer');
+            container.innerHTML = '';
+
+            // Find all positive divisors of moduloN
+            const divisors = [];
+            for (let i = 1; i <= moduloN; i++) {
+                if (moduloN % i === 0) divisors.push(i);
+            }
+
+            document.getElementById('divisorsInfo').innerText = `Menurut Teorema Lagrange, orde subgrup harus membagi ${moduloN}. Pembagi dari ${moduloN} adalah: ${divisors.join(', ')}.`;
+
+            divisors.forEach(d => {
+                // Subgroup order = d, generator step = moduloN / d
+                const genStep = moduloN / d;
+                const subElems = [];
+                for (let k = 0; k < d; k++) {
+                    subElems.push((k * genStep) % moduloN);
+                }
+
+                const card = document.createElement('div');
+                card.className = 'p-3 rounded-xl bg-slate-900/80 border border-slate-800 hover:border-pink-500/50 transition cursor-pointer group';
+                card.onclick = () => {
+                    highlightedSubgroupElems = subElems;
+                    inspectElement(genStep % moduloN);
+                };
+
+                const elemStr = subElems.length > 12 
+                    ? `{${subElems.slice(0, 10).join(', ')}, ...}` 
+                    : `{${subElems.join(', ')}}`;
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-xs font-mono text-pink-400 font-bold group-hover:text-pink-300">H = ⟨${genStep % moduloN}⟩</span>
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-pink-950/80 text-pink-300 border border-pink-500/30">Orde ${d}</span>
+                    </div>
+                    <div class="font-orbitron text-xs text-slate-300 font-medium overflow-x-auto whitespace-nowrap">
+                        ${elemStr}
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        // 3D Point Projection Helper (incorporates dynamic zoomScale)
+        function project3D(x, y, z, centerX, centerY, baseScale) {
+            // Apply Rotation Y
+            let x1 = x * Math.cos(rotY) + z * Math.sin(rotY);
+            let y1 = y;
+            let z1 = -x * Math.sin(rotY) + z * Math.cos(rotY);
+
+            // Apply Rotation X
+            let x2 = x1;
+            let y2 = y1 * Math.cos(rotX) - z1 * Math.sin(rotX);
+            let z2 = y1 * Math.sin(rotX) + z1 * Math.cos(rotX);
+
+            // Perspective Projection with Zoom Scale Factor
+            const distance = 400;
+            const fov = distance / (distance + z2);
+            const totalScale = baseScale * zoomScale;
+
+            return {
+                x: centerX + x2 * fov * totalScale,
+                y: centerY + y2 * fov * totalScale,
+                z: z2,
+                fov: fov
+            };
+        }
+
+        // Dynamic 3D Spherical Orbit Visualizer Renderer
+        function drawSphereOnCanvas(targetCanvas, targetCtx) {
+            const width = targetCanvas.width;
+            const height = targetCanvas.height;
+            const centerX = width / 2;
+            const centerY = height / 2;
+            
+            // Adjust sphere base radius relative to canvas size
+            const sphereRadius = Math.min(width, height) * 0.32;
+
+            targetCtx.clearRect(0, 0, width, height);
+
+            // Draw Background Multi-Planar Orbital Rings
+            const ringPlanes = [
+                { tiltX: 0, tiltY: 0, color: 'rgba(56, 189, 248, 0.15)' }, // Horizontal Equatorial
+                { tiltX: Math.PI / 2, tiltY: 0, color: 'rgba(168, 85, 247, 0.15)' }, // Vertical Meridian
+                { tiltX: Math.PI / 4, tiltY: Math.PI / 4, color: 'rgba(236, 72, 153, 0.12)' }, // Diagonal Orbit 1
+                { tiltX: -Math.PI / 4, tiltY: Math.PI / 3, color: 'rgba(16, 185, 129, 0.12)' } // Diagonal Orbit 2
+            ];
+
+            ringPlanes.forEach(plane => {
+                targetCtx.beginPath();
+                const steps = 60;
+                for (let i = 0; i <= steps; i++) {
+                    const theta = (i / steps) * Math.PI * 2;
+                    let rx = sphereRadius * Math.cos(theta);
+                    let ry = sphereRadius * Math.sin(theta);
+                    let rz = 0;
+
+                    let ry1 = ry * Math.cos(plane.tiltX) - rz * Math.sin(plane.tiltX);
+                    let rz1 = ry * Math.sin(plane.tiltX) + rz * Math.cos(plane.tiltX);
+                    let rx2 = rx * Math.cos(plane.tiltY) + rz1 * Math.sin(plane.tiltY);
+                    let rz2 = -rx * Math.sin(plane.tiltY) + rz1 * Math.cos(plane.tiltY);
+
+                    const pt = project3D(rx2, ry1, rz2, centerX, centerY, 1);
+                    if (i === 0) targetCtx.moveTo(pt.x, pt.y);
+                    else targetCtx.lineTo(pt.x, pt.y);
+                }
+                targetCtx.strokeStyle = plane.color;
+                targetCtx.lineWidth = 1.2 * zoomScale;
+                targetCtx.stroke();
+            });
+
+            // Calculate 3D Positions for Modulo N Elements Distributed Spherically
+            const coords = [];
+            for (let i = 0; i < moduloN; i++) {
+                const phi = Math.acos(-1 + (2 * i + 1) / moduloN);
+                const theta = Math.sqrt(moduloN * Math.PI) * phi + (i * (Math.PI * 2 / moduloN));
+
+                const x3d = sphereRadius * Math.sin(phi) * Math.cos(theta);
+                const y3d = sphereRadius * Math.cos(phi);
+                const z3d = sphereRadius * Math.sin(phi) * Math.sin(theta);
+
+                const proj = project3D(x3d, y3d, z3d, centerX, centerY, 1);
+                coords.push({ ...proj, origX: x3d, origY: y3d, origZ: z3d, index: i });
+            }
+
+            const isFullGenerator = gcd(activeGenerator, moduloN) === 1;
+
+            // Generator Trajectory Pathing through 3D Space
+            if (activeGenerator !== 0) {
+                targetCtx.beginPath();
+                let currIndex = 0;
+                const trajectory = [0];
+
+                for (let i = 0; i < moduloN; i++) {
+                    const nextIndex = (currIndex + activeGenerator) % moduloN;
+                    currIndex = nextIndex;
+                    trajectory.push(currIndex);
+                    if (currIndex === 0) break;
+                }
+
+                // Render 3D Trajectory Lines
+                for (let i = 0; i < trajectory.length - 1; i++) {
+                    const p1 = coords[trajectory[i]];
+                    const p2 = coords[trajectory[i + 1]];
+
+                    targetCtx.beginPath();
+                    targetCtx.moveTo(p1.x, p1.y);
+                    targetCtx.lineTo(p2.x, p2.y);
+
+                    const avgZ = (p1.z + p2.z) / 2;
+                    const alpha = Math.max(0.15, Math.min(1, (avgZ + sphereRadius) / (2 * sphereRadius)));
+
+                    if (isFullGenerator) {
+                        targetCtx.strokeStyle = `rgba(6, 182, 212, ${alpha * 0.9})`;
+                        targetCtx.lineWidth = Math.max(1, 2.2 * Math.max(p1.fov, p2.fov) * zoomScale);
+                        targetCtx.shadowColor = '#06b6d4';
+                        targetCtx.shadowBlur = 8 * alpha;
+                    } else {
+                        targetCtx.strokeStyle = `rgba(168, 85, 247, ${alpha * 0.8})`;
+                        targetCtx.lineWidth = Math.max(0.8, 1.6 * Math.max(p1.fov, p2.fov) * zoomScale);
+                        targetCtx.shadowColor = '#a855f7';
+                        targetCtx.shadowBlur = 5 * alpha;
+                    }
+                    targetCtx.stroke();
+                    targetCtx.shadowBlur = 0;
+                }
+
+                // Animated Pulses moving along 3D Trajectories
+                const pathLength = trajectory.length - 1;
+                const pulseCount = Math.min(pathLength, moduloN > 30 ? 6 : pathLength);
+                
+                for (let i = 0; i < pulseCount; i++) {
+                    const idx = Math.floor((i / pulseCount) * pathLength);
+                    const fromPt = coords[trajectory[idx]];
+                    const toPt = coords[trajectory[(idx + 1) % pathLength]];
+                    
+                    const segmentProgress = (animationAngle + (i / pulseCount)) % 1;
+                    const pX = fromPt.x + (toPt.x - fromPt.x) * segmentProgress;
+                    const pY = fromPt.y + (toPt.y - fromPt.y) * segmentProgress;
+                    const pZ = fromPt.z + (toPt.z - fromPt.z) * segmentProgress;
+
+                    const pulseAlpha = Math.max(0.2, (pZ + sphereRadius) / (2 * sphereRadius));
+
+                    targetCtx.beginPath();
+                    targetCtx.arc(pX, pY, (isFullGenerator ? 3.5 : 2.5) * Math.max(fromPt.fov, toPt.fov) * zoomScale, 0, Math.PI * 2);
+                    targetCtx.fillStyle = isFullGenerator ? `rgba(236, 72, 153, ${pulseAlpha})` : `rgba(56, 189, 248, ${pulseAlpha})`;
+                    targetCtx.shadowColor = isFullGenerator ? '#ec4899' : '#38bdf8';
+                    targetCtx.shadowBlur = 8;
+                    targetCtx.fill();
+                    targetCtx.shadowBlur = 0;
+                }
+            }
+
+            // Sort nodes by Z-depth for correct rendering order (back-to-front)
+            const sortedCoords = [...coords].sort((a, b) => a.z - b.z);
+
+            // Dynamically adjust node radius based on total number of modulo elements
+            const baseRadius = (moduloN > 50 ? 6 : (moduloN > 25 ? 9 : (moduloN > 10 ? 12 : 14))) * (width > 600 ? 1.3 : 1.0);
+
+            // Render 3D Element Nodes
+            sortedCoords.forEach((pt) => {
+                const i = pt.index;
+                const isSubgroupMember = highlightedSubgroupElems.length > 0 && highlightedSubgroupElems.includes(i);
+                const isSelected = i === activeGenerator;
+
+                const nodeRadius = (isSelected ? baseRadius + 4 : baseRadius) * pt.fov * zoomScale;
+                const alphaDepth = Math.max(0.3, Math.min(1, (pt.z + sphereRadius + 40) / (2 * sphereRadius)));
+
+                targetCtx.beginPath();
+                targetCtx.arc(pt.x, pt.y, Math.max(3, nodeRadius), 0, Math.PI * 2);
+
+                if (isSelected) {
+                    targetCtx.fillStyle = `rgba(6, 182, 212, ${alphaDepth})`;
+                    targetCtx.shadowColor = '#06b6d4';
+                    targetCtx.shadowBlur = 18;
+                } else if (isSubgroupMember) {
+                    targetCtx.fillStyle = `rgba(16, 185, 129, ${alphaDepth})`;
+                    targetCtx.shadowColor = '#10b981';
+                    targetCtx.shadowBlur = 12;
+                } else {
+                    targetCtx.fillStyle = `rgba(15, 23, 42, ${alphaDepth * 0.95})`;
+                    targetCtx.shadowBlur = 0;
+                }
+                targetCtx.fill();
+
+                targetCtx.strokeStyle = isSelected 
+                    ? '#ffffff' 
+                    : (isSubgroupMember 
+                        ? `rgba(52, 211, 153, ${alphaDepth})` 
+                        : `rgba(56, 189, 248, ${alphaDepth})`);
+                targetCtx.lineWidth = (isSelected ? 2 : 1) * pt.fov * zoomScale;
+                targetCtx.stroke();
+                targetCtx.shadowBlur = 0;
+
+                // Labels with scaled font according to perspective and node count
+                if (moduloN <= 50 || isSelected || isSubgroupMember || i % 5 === 0) {
+                    targetCtx.fillStyle = isSelected ? '#000000' : `rgba(243, 244, 246, ${alphaDepth})`;
+                    const fontSize = (moduloN > 40 ? 8 : (moduloN > 20 ? 9 : 11)) * (width > 600 ? 1.3 : 1.0) * zoomScale;
+                    targetCtx.font = `bold ${Math.max(7, Math.round(fontSize * pt.fov))}px Orbitron, sans-serif`;
+                    targetCtx.textAlign = 'center';
+                    targetCtx.textBaseline = 'middle';
+                    targetCtx.fillText(i.toString(), pt.x, pt.y);
+                }
+            });
+        }
+
+        function renderClock() {
+            if (isAutoRotating && !isDragging) {
+                rotY += 0.005;
+            }
+
+            animationAngle += 0.015;
+
+            // Render normal view canvas
+            if (canvas && ctx) {
+                drawSphereOnCanvas(canvas, ctx);
+            }
+
+            // Render fullscreen modal canvas if open
+            if (isFullscreen && modalCanvas && modalCtx) {
+                drawSphereOnCanvas(modalCanvas, modalCtx);
+            }
+
+            requestAnimationFrame(renderClock);
+        }
+    </script>
+</body>
+</html>
