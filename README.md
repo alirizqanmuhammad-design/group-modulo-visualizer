@@ -2,10 +2,6 @@
 
 > A high-tech, interactive mathematical dashboard and 3D spherical orbit visualizer for finite cyclic groups and abstract algebra structures.
 
-[![Live Demo](https://img.shields.io/badge/Live-Demo-cyan?style=for-the-badge&logo=github)](https://alirizqanmuhammad-design.github.io/group-modulo-visualizer/)
-[![Math Pure](https://img.shields.io/badge/Field-Abstract%20Algebra-purple?style=for-the-badge)]()
-[![License: MIT](https://img.shields.io/badge/License-MIT-pink?style=for-the-badge)](LICENSE)
-
 ---
 
 ## 🚀 Overview
